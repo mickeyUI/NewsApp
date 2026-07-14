@@ -1,0 +1,37 @@
+# Firebase configuration 
+App/google-services.json
+ScraperScript/firebase-service-account.json
+
+# Telegram session files
+ScraperScript/*.session
+ScraperScript/*.session-journal
+
+# dependencies
+App/node_modules/
+
+# configs
+App/android/.gradle/
+App/android/app/build/
+App/android/local.properties
+App/android/*.keystore
+
+#Expo caches
+App/.expo/
+App/.metro/
+App/.env
+
+# virtual environments
+ScraperScript/.venv/
+ScraperScript/env/
+
+#Python cache
+**/__pycache__/
+*.py[cod]
+
+# =========================================================================
+# 4. Global System Files
+# =========================================================================
+.DS_Store
+Thumbs.db**/.env*
+ScraperScript/.env
+.env
