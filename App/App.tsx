@@ -4,20 +4,17 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screens/HomeScreen';
-import LoginScreen from './screens/LoginScreen';
+import Search from './screens/Search';
 import ProfileScreen from './screens/ProfileScreen';
+import PostView from './screens/PostView';
 
 const TabGroup = createBottomTabNavigator({
   screens: {
-    // The first item defaults to the starting tab
     Home: {
       screen: HomeScreen,
-      options: {
-        title: 'home', // Changes the text on the header and tab button
-      },
     },
     Search: {
-      screen: LoginScreen,
+      screen: Search,
     },
     Profile: {
       screen: ProfileScreen,
@@ -25,7 +22,20 @@ const TabGroup = createBottomTabNavigator({
   },
 });
 
-const Navigation = createStaticNavigation(TabGroup);
+const Stack= createNativeStackNavigator({
+  screens: {
+    TabGroup: {
+      screen: TabGroup,
+      options: {
+        headerShown: false
+  },
+    },
+    PostView: PostView,
+  }
+});
+
+
+const Navigation = createStaticNavigation(Stack);
 
 export default function App() {
 

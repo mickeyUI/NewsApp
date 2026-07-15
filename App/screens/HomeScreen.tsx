@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Pressable } from 'react-native';
 import { getFirestore, collection, getDocs } from '@react-native-firebase/firestore'; 
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ProductListScreen() {
+
+export default function HomeScreen() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const navigation= useNavigation<any>();
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -39,7 +42,7 @@ export default function ProductListScreen() {
           </Text>
 
       </View>
-          <Pressable style={Styles.ReadMoreButton} onPress={() => console.log('Read More pressed')}>
+          <Pressable style={Styles.ReadMoreButton} onPress={() => navigation.navigate("PostView")}>
            <LinearGradient
   colors={['rgba(0, 0, 0, 0)', 'rgb(0, 120, 120)']} 
   start={{ x: 1, y: 0 }}
@@ -82,11 +85,12 @@ const Styles = StyleSheet.create({
     backgroundColor: "lightblue",
     margin: 10,
     borderRadius: 10,
-  
+    
   }, 
   textContainer: {
     flex: 1,
     padding: 10,
+    maxHeight: 160,
   
     
   },
