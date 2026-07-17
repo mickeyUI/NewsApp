@@ -1,21 +1,37 @@
-import { StyleSheet, View, Text, ScrollView} from "react-native";
+import { StyleSheet, View, Text, ScrollView, Image, Pressable} from "react-native";
+import { useRoute } from "@react-navigation/native";
+import { useState } from "react";
 
 export default function PostView() {
-    const trialContent= "New Public Transport Project Aims to Reduce Traffic CongestionCity officials have unveiled plans for a major public transportation expansion designed to reduce traffic congestion and improve mobility for residents. The proposal includes additional bus routes, dedicated bus lanes, and modern digital ticketing systems.Transportation planners estimate that the completed project could reduce average commuting times by as much as 20 percent during peak hours."
+    const route = useRoute();
+    const {post}: any = route.params;
+    const [content, setContent]= useState(post.textAm);
+    const [lang, setLang] = useState("amh")
+    const changeLang= () => {
+        if (lang == "amh") {
+            setContent(post.textEn);
+            setLang("eng")
+        } else {
+            setContent(post.textAm)
+            setLang("amh")
+        }
+    }
     return (
         <View>
             <ScrollView>
             <View style= {{padding: 10}}>
-            <Text style= {{fontSize: 30}}>This is the Headline Section</Text>
+            <Text style= {{fontSize: 30}}>{post.summarizedText}</Text>
             </View>
-            <View style= {{backgroundColor: "lightblue", height: 200, width: "auto", margin: 10, borderRadius: 10}}>
-            </View>
+            
+            <Image source={{uri: post.headerImage}} style= {{backgroundColor: "lightblue", height: 200, width: "auto", margin: 10, borderRadius: 10}} />
+           
             <View style= {{padding:10}}> 
-                <Text style= {{fontSize: 16, paddingBottom: 10}}>{trialContent}</Text>
-                <Text style= {{fontSize: 16, paddingBottom: 10}}>{trialContent}</Text>
-                <Text style= {{fontSize: 16, paddingBottom: 10}}>{trialContent}</Text>
-                <Text style= {{fontSize: 16, paddingBottom: 10}}>{trialContent}</Text>
+                <Text style= {{fontSize: 16, paddingBottom: 10}}>{content}</Text>
             </View>
+
+            <Pressable onPress={() => {changeLang();}} style= {{height: 40, justifyContent:"center", alignItems: "center", backgroundColor: "lightgreen",margin: 10, marginBottom: 20}}>
+                <Text>Language Change</Text>
+            </Pressable>
 
             </ScrollView>
         </View>

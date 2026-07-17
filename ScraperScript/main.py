@@ -7,8 +7,11 @@ from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 from groq import Groq
+from supabase import create_client
 
 load_dotenv()
+    
+    
 
 API_ID_STR = os.getenv("TELEGRAM_API_ID")
 if API_ID_STR is None:
@@ -28,8 +31,6 @@ client = TelegramClient("ethio_news_session", API_ID, API_HASH)
 import os
 from groq import Groq
 
-import os
-from groq import Groq
 
 def summarization(txt: str) -> str:
     client = Groq(
@@ -81,11 +82,12 @@ def summarization(txt: str) -> str:
 
 
 def detect_language(text: str) -> str:
-    try:
-        lang = detect(text)
-        return "am" if lang == "am" else "en"
-    except:
-        return "en"  
+    # try:
+    #     lang = detect(text)
+    #     return "am" if lang == "am" else "en"
+    # except:
+    #     return "en"  
+    return "am"
 
 def get_media_info(message):
     if isinstance(message.media, MessageMediaPhoto):
@@ -94,9 +96,34 @@ def get_media_info(message):
         return "document"
     return None
 
+#supabase connection
+url= os.getenv("SUPABASE_URL")
+key= os.getenv("SUPABASE_KEY")
+
+supabase= create_client(url, key)
+
+def UploadToSupabase(filepath):
+    file_name = os.path.basename(filepath)
+    print(file_name)
+    with open(filepath, "rb") as f:
+        response = (supabase.storage.from_("ETNewsImages").upload(file=f,path=f"IMG/{file_name}", file_options={"upsert": "True"}))
+    PublicUrl = (supabase.storage.from_("ETNewsImages").get_public_url(f"IMG/{file_name}"))
+    if (PublicUrl):
+        return PublicUrl
+    return ""
+
 @client.on(events.NewMessage(chats=TARGET_CHANNELS))
 async def handler(event):
     message = event.message
+    supaUrl: str = ""
+
+    if event.message.photo:
+        download_dir = '/home/mickey/Downloads/ETNewsScraperMedia'
+        os.makedirs(download_dir, exist_ok=True)
+        file_path = await message.download_media(file= download_dir)
+        supaUrl = await UploadToSupabase(file_path) 
+        
+        
 
     if not message.text or message.text.strip() == "":
         print("⏭️ Skipped empty message")
@@ -121,6 +148,7 @@ async def handler(event):
     post_data = {
         "channelSource": event.chat.title,
         "channelUsername": event.chat.username,
+        "headerImage": supaUrl,
         "summarizedText": summrization_text,
         "originalText": raw_text,
         "originalLanguage": original_language,
