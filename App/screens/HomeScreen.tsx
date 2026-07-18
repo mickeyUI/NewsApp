@@ -20,11 +20,11 @@ export default function HomeScreen() {
         const productsRef = collection(db, 'posts');
         const snapshot: any = await getDocs(productsRef);
         
-        const loadedProducts = snapshot.docs.map((doc: any) => ({
+        const loadedProducts:any = snapshot.docs.map((doc: any) => ({
           id: doc.id,
           ...doc.data()
         })) as any;
-
+        loadedProducts.sort((a: any, b: any) => new Date(b.scrapedAt).getTime() - new Date(a.scrapedAt).getTime());
         setProducts(loadedProducts);
       } catch (error: any) {
         console.error("Native Firestore Error: ", error);
@@ -87,38 +87,41 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={Styles.ParentContainer}>
-      <ScrollView horizontal={true} style={{ padding: 10, backgroundColor: "", flexDirection: "row"}}>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+    <ScrollView style={Styles.ParentContainer}>
+      <ScrollView horizontal={true} style={{ padding: 10, backgroundColor: "", flexDirection: "row", }}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
-        <View style={{height: 30,width: 100, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
+        <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
       </ScrollView>
+      <View style= {{padding: 10}}>
+        <Text style={{color: "red", fontSize: 30, fontWeight: "bold", fontFamily: ""}}>Todays News</Text>
+      </View>
       <FlatList 
       data={products}
       renderItem={ ({item}) => <Posts post= {item}/>}
       keyExtractor={item => item.id} />
-    </View>
+    </ScrollView>
   );
 }
 

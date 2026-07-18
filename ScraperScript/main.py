@@ -121,7 +121,7 @@ async def handler(event):
         download_dir = '/home/mickey/Downloads/ETNewsScraperMedia'
         os.makedirs(download_dir, exist_ok=True)
         file_path = await message.download_media(file= download_dir)
-        supaUrl = await UploadToSupabase(file_path) 
+        supaUrl = UploadToSupabase(file_path) 
         
         
 

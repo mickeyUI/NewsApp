@@ -16,6 +16,19 @@ export default function PostView() {
             setLang("amh")
         }
     }
+
+    type imagee = {
+        image: string
+    }
+
+    const IMG= ({image}: imagee) => {
+        if (!image) {
+            return
+        }
+        return (
+            <Image source={{uri: image}} style= {{ height: 200, width: "auto", margin: 10, borderRadius: 10}} />
+        )
+    }
     return (
         <View>
             <ScrollView>
@@ -23,7 +36,7 @@ export default function PostView() {
             <Text style= {{fontSize: 30}}>{post.summarizedText}</Text>
             </View>
             
-            <Image source={{uri: post.headerImage}} style= {{backgroundColor: "lightblue", height: 200, width: "auto", margin: 10, borderRadius: 10}} />
+            <IMG image= {post.headerImage}/>
            
             <View style= {{padding:10}}> 
                 <Text style= {{fontSize: 16, paddingBottom: 10}}>{content}</Text>
