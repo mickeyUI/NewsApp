@@ -1,9 +1,10 @@
 from telethon import TelegramClient, events
 from telethon.tl.types import MessageMediaPhoto, MessageMediaDocument
 from firebase_client import save_post
-from translator import translate_to_english, translate_to_amharic
+from translator import translate_to_english, translate_to_amharic, classify_post
 from langdetect import detect
 from datetime import datetime, timezone
+import re
 import os
 from dotenv import load_dotenv
 from groq import Groq
@@ -80,21 +81,54 @@ def summarization(txt: str) -> str:
     return " ".join(headline.split()[:10])
 
 
-
 def detect_language(text: str) -> str:
-    # try:
-    #     lang = detect(text)
-    #     return "am" if lang == "am" else "en"
-    # except:
-    #     return "en"  
-    return "am"
+    try:
+        lang = detect(text)
 
-def get_media_info(message):
-    if isinstance(message.media, MessageMediaPhoto):
-        return "photo"
-    elif isinstance(message.media, MessageMediaDocument):
-        return "document"
-    return None
+        if lang == "en":
+            return "En"
+        elif lang == "am":
+            return "Amh"
+        else:
+            return "Amh"
+
+    except Exception:
+        return "Amh"
+
+import re
+
+def clean_text(text: str, lang: str) -> str:
+    # Remove 3 or more consecutive stars
+    text = re.sub(r"\*{3,}", " ", text)
+    if lang == "En":
+        # Remove hashtag symbol only (#word -> word)
+        text = re.sub(r"#(?=\w+)", "", text)
+    if lang == "Amh":
+        # Remove hashtags completely (#word -> "")
+        text = re.sub(r"#\w+", "", text)
+
+    # Remove mentions completely (@word -> "")
+    text = re.sub(r"@\w+", "", text)
+
+    # Remove remaining single stars
+    text = text.replace("*", "")
+
+    # Remove https links
+    #text = re.sub(r"https?://\S+", "", text)
+
+    # Normalize spaces
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
+
+def deep_clean(text: str) -> str:
+    text = re.sub(r"\*{3,}", " ", text)
+    text = re.sub(r"[#@]\w+", "", text)
+    text = text.replace("*", "")
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
 
 #supabase connection
 url= os.getenv("SUPABASE_URL")
@@ -130,39 +164,58 @@ async def handler(event):
         return
 
     raw_text = message.text.strip()
-    original_language = detect_language(raw_text)
+    original_language = detect_language(deep_clean(raw_text))
+    raw_text= clean_text(raw_text, original_language)
+    print(original_language)
 
     print(f"📨 New post from {event.chat.username} | lang: {original_language}")
 
-    if original_language == "am":
+    if original_language == "Amh":
         text_am = raw_text
         text_en = translate_to_english(raw_text)
     else:
         text_en = raw_text
         text_am = translate_to_amharic(raw_text)
 
-    media_type = get_media_info(message)
-
     summrization_text = summarization(raw_text)
+    classifications= classify_post(text_en)
+
+    composer= 'unknown'
+    if message.fwd_from:
+        channel = await client.get_entity(message.fwd_from.from_id)
+        composer = channel.title
+        print("Forwarded from:", channel.title)
 
     post_data = {
-        "channelSource": event.chat.title,
-        "channelUsername": event.chat.username,
-        "headerImage": supaUrl,
         "summarizedText": summrization_text,
+        "headerImage": supaUrl,
         "originalText": raw_text,
         "originalLanguage": original_language,
         "textAm": text_am,
         "textEn": text_en,
+        "category": classifications["category"],
+        "importance": classifications["importance"],
+        "isBreaking": classifications["isBreaking"],
+        "channelSource": composer,
         "postedAt": message.date.replace(tzinfo=timezone.utc).isoformat(),
         "scrapedAt": datetime.now(timezone.utc).isoformat(),
-        "status": "published",
-        "mediaUrl": None,
-        "mediaType": media_type,
-        "commentCount": 0,
+        "views": 0,
+        "read": 0,
+        "published": True,
     }
 
-    save_post(post_data)
+    try:
+        save_post(post_data)
+
+        await client.send_message(
+            "StatusCheckOk",
+            f"✅ Post added successfully\n\n"
+        )
+    except Exception as e:
+        await client.send_message(
+            "StatusCheckOk",
+            f"❌ Failed to save post\n\nError:\n{str(e)}"
+        )
 
 async def main():
     await client.start(phone=PHONE)
