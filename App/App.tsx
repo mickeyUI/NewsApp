@@ -1,55 +1,92 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { createStaticNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './screens/HomeScreen';
-import Search from './screens/Search';
-import ProfileScreen from './screens/ProfileScreen';
-import PostView from './screens/PostView';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import { createStaticNavigation } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import HomeScreen from "./screens/HomeScreen";
+import Search from "./screens/Search";
+import ProfileScreen from "./screens/ProfileScreen";
+import PostView from "./screens/PostView";
+import SplashScreen from "./screens/SplashScreen";
+import LoginScreen from "./screens/LoginScreen";
+import OnBoardingScreen from "./screens/OnBoardingScreen";
+import SignupScreen from "./screens/SignupScreen";
 
 const TabGroup = createBottomTabNavigator({
   screens: {
     Home: {
       screen: HomeScreen,
+      options: {
+        headerShown: false,
+      },
     },
     Search: {
       screen: Search,
+      options: {
+        headerShown: false,
+      },
     },
     Profile: {
       screen: ProfileScreen,
+      options: {
+        headerShown: false,
+      },
     },
   },
 });
 
-const Stack= createNativeStackNavigator({
+const Stack = createNativeStackNavigator({
   screens: {
+    SplashScreen: {
+      screen: SplashScreen,
+      options: {
+        headerShown: false,
+      },
+    },
+    LoginScreen: {
+      screen: LoginScreen,
+      options: {
+        headerShown: false,
+      },
+    },
+    SignupScreen: {
+      screen: SignupScreen,
+      options: {
+        headerShown: false,
+      },
+    },
+    OnBoardingScreen: {
+      screen: OnBoardingScreen,
+      options: {
+        headerShown: false,
+      },
+    },
     TabGroup: {
       screen: TabGroup,
       options: {
-        headerShown: false
-  },
+        headerShown: false,
+      },
     },
-    PostView: PostView,
-  }
+    PostView: {
+      screen: PostView,
+      options: {
+        headerShown: false,
+      },
+    },
+  },
 });
-
 
 const Navigation = createStaticNavigation(Stack);
 
 export default function App() {
-
-  return (
-    <Navigation/>
-      
-  );
+  return <Navigation />;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

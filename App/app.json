@@ -17,16 +17,23 @@
     },
     "android": {
       "package": "com.mickey.NewsApp",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      }
     },
     "plugins": [
       "@react-native-firebase/app",
       [
         "expo-build-properties",
         {
-          "ios": { "useFrameworks": "static" }
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
-      ]
+      ],
+      "@react-native-google-signin/google-signin"
     ]
   }
 }

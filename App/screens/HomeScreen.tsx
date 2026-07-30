@@ -20,10 +20,17 @@ import { useNavigation } from "@react-navigation/native";
 import { getFromStorage } from "../hooks/fireStoreOperations";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Post } from "../config/types";
-import { pullFeed, lastDoc } from "../hooks/fireStoreOperations";
+import {
+  pullFeed,
+  lastDoc,
+  incrementViewsForPosts,
+} from "../hooks/fireStoreOperations";
+import { Eye, BookOpen, Rss } from "lucide-react-native";
 
 export default function HomeScreen() {
   const [products, setProducts] = useState<any[]>([]);
+  const [queue, setQueue] = useState<any[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [breakingNews, setBreakingNews] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,8 +39,14 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const loadedProducts = await pullFeed();
-        setProducts(loadedProducts);
+        const rankedPosts = await pullFeed(50);
+
+        const firstFive = rankedPosts.slice(0, 5);
+
+        setProducts(firstFive);
+        setQueue(rankedPosts.slice(5));
+
+        await incrementViewsForPosts(firstFive);
         // i'm gonna add this later after finishing he core stuff
         // const breakingNewsData: any = loadedProducts.filter( post => post?.isBreaking == true);
         // setBreakingNews(breakingNewsData);
@@ -47,6 +60,44 @@ export default function HomeScreen() {
 
     fetchProducts();
   }, []);
+
+  const loadMore = async () => {
+    if (loadingMore) return;
+
+    setLoadingMore(true);
+
+    try {
+      let currentQueue = [...queue];
+
+      // If there aren't enough posts waiting, fetch more
+      if (currentQueue.length < 10) {
+        const newPosts = await pullFeed(50);
+        currentQueue = [...currentQueue, ...newPosts];
+      }
+
+      // Nothing left to show
+      if (currentQueue.length === 0) {
+        return;
+      }
+
+      // Get the next 10 posts
+      const nextPosts = currentQueue.slice(0, 10);
+
+      // Display them
+      setProducts((prev) => [...prev, ...nextPosts]);
+
+      // Remove them from the queue
+      setQueue(currentQueue.slice(nextPosts.length));
+
+      // Mark these posts as viewed
+      await incrementViewsForPosts(nextPosts);
+    } catch (err) {
+      console.error("Failed to load more posts:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   type IMGG = {
     url: string;
   };
@@ -85,7 +136,34 @@ export default function HomeScreen() {
               {post.summarizedText}
             </Text>
             <View style={{ height: 35 }}>
-              <Text style={{ fontSize: 11 }}>{post.originalText}</Text>
+              <Text numberOfLines={2} style={{ fontSize: 11 }}>
+                {post.originalText}
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "flex-start",
+              gap: 10,
+              paddingHorizontal: 10,
+            }}
+          >
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <Eye color="gray" size={15} strokeWidth={2} />
+              <Text style={{ color: "gray", fontSize: 10 }}>{post.views}</Text>
+            </View>
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <BookOpen color="gray" size={15} strokeWidth={2} />
+              <Text style={{ color: "gray", fontSize: 10 }}>{post.read}</Text>
+            </View>
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <Rss color="gray" size={15} strokeWidth={2} />
+              <Text style={{ color: "gray", fontSize: 10 }}>
+                {post.channelSource}
+              </Text>
             </View>
           </View>
 
@@ -103,11 +181,9 @@ export default function HomeScreen() {
             <Text style={Styles.metaData}>{formatDate(post.scrapedAt)}</Text>
           </View>
           {/* for debuging */}
-          <Text>read: {post.read}</Text>
-          <Text>views:{post.views || 0}</Text>
-          <Text>{post.category || "none"}</Text>
+          {/* <Text>{post.category || "none"}</Text>
           <Text>impo:{post.importance || "none"}</Text>
-          <Text>score: {post.score}</Text>
+          <Text>score: {post.score}</Text> */}
         </Pressable>
       </View>
     );
@@ -155,11 +231,11 @@ export default function HomeScreen() {
       </ScrollView> */}
       <FlatList
         ListHeaderComponent={
-          <View style={{ paddingHorizontal: 10, paddingTop: 20 }}>
+          <View style={{ paddingHorizontal: 20, paddingTop: 50 }}>
             <BreakingNewsCards content={breakingNews[0]} />
             <Text
               style={{
-                color: "red",
+                color: "#250e5e",
                 fontSize: 30,
                 fontWeight: "bold",
                 fontFamily: "",
@@ -172,6 +248,10 @@ export default function HomeScreen() {
         data={products}
         renderItem={({ item }) => <Posts post={item} />}
         keyExtractor={(item) => item.id}
+        refreshing={false}
+        onRefresh={pullFeed}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
       />
     </View>
   );

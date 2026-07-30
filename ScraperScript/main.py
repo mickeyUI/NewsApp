@@ -100,12 +100,6 @@ import re
 def clean_text(text: str, lang: str) -> str:
     # Remove 3 or more consecutive stars
     text = re.sub(r"\*{3,}", " ", text)
-    if lang == "En":
-        # Remove hashtag symbol only (#word -> word)
-        text = re.sub(r"#(?=\w+)", "", text)
-    if lang == "Amh":
-        # Remove hashtags completely (#word -> "")
-        text = re.sub(r"#\w+", "", text)
 
     # Remove mentions completely (@word -> "")
     text = re.sub(r"@\w+", "", text)
@@ -114,11 +108,26 @@ def clean_text(text: str, lang: str) -> str:
     text = text.replace("*", "")
 
     # Remove https links
-    #text = re.sub(r"https?://\S+", "", text)
+    text = re.sub(r"https?://\S+", "", text)
 
     # Normalize spaces
     text = re.sub(r"\s+", " ", text).strip()
 
+    if lang == "En":
+        # Remove hashtag symbol only (#word -> word)
+        text = re.sub(r"#(?=\w+)", "", text)
+        text = re.sub(r"\.", ".\n\n", text)
+    if lang == "Amh":
+        # Remove hashtags completely (#word -> "")
+        text = re.sub(r"#\w+", "", text)
+        # Add two newlines after every second Ethiopic full stop (።)
+        count = 0
+        def replace(match):
+            nonlocal count
+            count += 1
+            return "።\n\n" if count % 2 == 0 else "።"
+        text = re.sub(r"።", replace, text)
+        
     return text
 
 def deep_clean(text: str) -> str:

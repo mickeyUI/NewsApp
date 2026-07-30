@@ -1,5 +1,6 @@
 # Firebase configuration 
 App/google-services.json
+App/firebase-service-account.json
 ScraperScript/firebase-service-account.json
 
 # Telegram session files

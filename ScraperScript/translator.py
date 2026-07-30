@@ -69,7 +69,7 @@ def classify_post(text: str) -> dict:
                 "role": "system",
                 "content": """You are a news classification assistant. Given a news article, return ONLY a valid JSON object with exactly these fields:
 {
-  "category": one of ["Politics", "Business", "Sports", "Health", "Entertainment", "International", "Neutral", "technology"],
+  "category": one of ["Politics", "Business", "Sports", "Health", "Entertainment", "International", "Neutral", "technology", "Religion"],
   "importance": one of [1, 2, 3] where 1=minor, 2=normal, 3=major story,
   "isBreaking": true or false
 }
@@ -88,7 +88,7 @@ Return nothing else. No explanation, no markdown, just the JSON object."""
     try:
         result = json.loads(raw)
         # Validate fields in case Groq returns unexpected values
-        valid_categories = ["Politics", "Business", "Sports", "Health", "Entertainment", "International", "Neutral", "Technology"]
+        valid_categories = ["Politics", "Business", "Sports", "Health", "Entertainment", "International", "Neutral", "Technology", "Religion"]
         if result.get("category") not in valid_categories:
             result["category"] = "Neutral"  # safe default
         if result.get("importance") not in [1, 2, 3]:

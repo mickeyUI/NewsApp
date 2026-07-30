@@ -11,10 +11,12 @@ import {
   limit,
   orderBy,
   startAfter,
+  getDoc,
 } from "@react-native-firebase/firestore";
+import { auth, db } from "../config/firebaseConfig";
 
-const db = getFirestore();
-export const lastDoc = null;
+// const db = getFirestore();
+export let lastDoc: any = null;
 // asyncStorage operations
 export const addToStorage = async (
   ReadOrView: string,
@@ -32,7 +34,6 @@ export const getFromStorage = async (ReadOrView: string) => {
     return [];
   }
   const lst = JSON.parse(values);
-  console.log(lst);
   return lst;
 };
 
@@ -51,6 +52,25 @@ export const incrementUniqueReads = async (id: string) => {
   console.log("Read increamented");
 };
 
+export const incrementViewsForPosts = async (posts: any[]) => {
+  for (const post of posts) {
+    await incrementUniqueView(post.id);
+  }
+};
+
+export const incrementUniqueView = async (id: string) => {
+  const viewedIds = await getFromStorage("viewIds");
+  if (viewedIds.includes(id)) {
+    return;
+  }
+  await addToStorage("viewIds", id);
+  const docRef = doc(db, "posts", id);
+  await updateDoc(docRef, {
+    views: increment(1),
+  });
+  console.log("View incremented");
+};
+
 // FYP curation operations
 const scoredList = [];
 const thisWeekStart = () => {
@@ -59,8 +79,30 @@ const thisWeekStart = () => {
   return aWeekAgo.toISOString();
 };
 
-const computeScore = (post: any) => {
-  const preferredCategories = ["International", "Sports", "Politics"];
+let preferredCategories: string[] = [];
+const getPreferredCategeory = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    console.log("No user found");
+    return;
+  }
+  try {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (!userDoc.exists()) {
+      console.log("User document does not exist");
+      return;
+    }
+
+    const data = await userDoc.data();
+    preferredCategories = data?.preferences ?? [];
+  } catch (error) {
+    console.error("Error fetching preferred categories:", error);
+    return [];
+  }
+};
+getPreferredCategeory();
+
+const computeScore = async (post: any) => {
   const now = Date.now();
 
   const categoryScore = preferredCategories.includes(post.category) ? 1 : 0;
@@ -86,58 +128,61 @@ const computeScore = (post: any) => {
   return score;
 };
 
-export const pullFeed = async () => {
-  const scoredList: any = [];
-  if (lastDoc) {
-    const querySnapshot = await getDocs(
-      query(
+export const pullFeed = async (targetCount: number = 30) => {
+  // await AsyncStorage.clear();
+  const viewedIds = await getFromStorage("viewIds");
+  const scoredList: any[] = [];
+
+  while (scoredList.length < targetCount) {
+    let q;
+
+    if (lastDoc) {
+      q = query(
         collection(db, "posts"),
         where("published", "==", true),
         where("postedAt", ">=", thisWeekStart()),
         orderBy("postedAt", "desc"),
         startAfter(lastDoc),
         limit(50),
-      ),
-    );
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-
-      const scoreN = computeScore(data);
-
-      scoredList.push({
-        id: doc.id,
-        ...data,
-        score: scoreN,
-      });
-    });
-
-    scoredList.sort((a: any, b: any) => b.score - a.score);
-    // for test 5
-    return scoredList.slice(0, 20);
-  } else {
-    const querySnapshot = await getDocs(
-      query(
+      );
+    } else {
+      q = query(
         collection(db, "posts"),
         where("published", "==", true),
         where("postedAt", ">=", thisWeekStart()),
         orderBy("postedAt", "desc"),
         limit(50),
-      ),
-    );
-    querySnapshot.forEach((doc) => {
+      );
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      break;
+    }
+
+    lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+    for (const doc of querySnapshot.docs) {
       const data = doc.data();
 
-      const scoreN = computeScore(data);
+      if (viewedIds.includes(doc.id)) {
+        continue;
+      }
 
       scoredList.push({
         id: doc.id,
         ...data,
-        score: scoreN,
+        score: computeScore(data),
       });
-    });
+    }
 
-    scoredList.sort((a: any, b: any) => b.score - a.score);
-    // for test 5
-    return scoredList.slice(0, 20);
+    if (querySnapshot.docs.length < 50) {
+      break;
+    }
   }
+
+  scoredList.sort((a, b) => b.score - a.score);
+
+  return scoredList.slice(0, targetCount);
 };
