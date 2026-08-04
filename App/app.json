@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ETNews",
-    "slug": "ETNews",
+    "name": "OCEA",
+    "slug": "OCEA",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -33,7 +33,8 @@
           }
         }
       ],
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-font"
     ]
   }
 }

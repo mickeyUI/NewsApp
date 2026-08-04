@@ -173,7 +173,7 @@ export const pullFeed = async (targetCount: number = 30) => {
       scoredList.push({
         id: doc.id,
         ...data,
-        score: computeScore(data),
+        score: await computeScore(data),
       });
     }
 

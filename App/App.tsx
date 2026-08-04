@@ -11,25 +11,42 @@ import SplashScreen from "./screens/SplashScreen";
 import LoginScreen from "./screens/LoginScreen";
 import OnBoardingScreen from "./screens/OnBoardingScreen";
 import SignupScreen from "./screens/SignupScreen";
+import { Home, SearchIcon, UserRound } from "lucide-react-native";
 
 const TabGroup = createBottomTabNavigator({
+  screenOptions: {
+    tabBarActiveTintColor: "#2c2b2e",
+    tabBarInactiveTintColor: "gray",
+    tabBarActiveSize: 20,
+    tabBarInactiveSize: 10,
+    tabBarShowLabel: true,
+  },
   screens: {
     Home: {
       screen: HomeScreen,
       options: {
         headerShown: false,
+        tabBarIcon: ({ color, size, focused }) => (
+          <Home color={color} size={20} strokeWidth={3} />
+        ),
       },
     },
     Search: {
       screen: Search,
       options: {
         headerShown: false,
+        tabBarIcon: ({ color, size, focused }) => (
+          <SearchIcon color={color} size={20} strokeWidth={3} />
+        ),
       },
     },
     Profile: {
       screen: ProfileScreen,
       options: {
         headerShown: false,
+        tabBarIcon: ({ color, size, focused }) => (
+          <UserRound color={color} size={20} strokeWidth={3} />
+        ),
       },
     },
   },

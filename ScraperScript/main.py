@@ -116,7 +116,13 @@ def clean_text(text: str, lang: str) -> str:
     if lang == "En":
         # Remove hashtag symbol only (#word -> word)
         text = re.sub(r"#(?=\w+)", "", text)
-        text = re.sub(r"\.", ".\n\n", text)
+        count = 0
+        def replacedot(match):
+            nonlocal count
+            count += 1
+            return "።\n\n" if count % 2 == 0 else "."
+        text = re.sub(r".", replacedot, text)
+        
     if lang == "Amh":
         # Remove hashtags completely (#word -> "")
         text = re.sub(r"#\w+", "", text)

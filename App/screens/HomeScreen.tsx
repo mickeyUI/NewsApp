@@ -26,6 +26,7 @@ import {
   incrementViewsForPosts,
 } from "../hooks/fireStoreOperations";
 import { Eye, BookOpen, Rss } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const [products, setProducts] = useState<any[]>([]);
@@ -159,12 +160,14 @@ export default function HomeScreen() {
               <BookOpen color="gray" size={15} strokeWidth={2} />
               <Text style={{ color: "gray", fontSize: 10 }}>{post.read}</Text>
             </View>
-            <View style={{ flexDirection: "row", gap: 5 }}>
-              <Rss color="gray" size={15} strokeWidth={2} />
-              <Text style={{ color: "gray", fontSize: 10 }}>
-                {post.channelSource}
-              </Text>
-            </View>
+            {post.channelSource != "unknown" ? (
+              <View style={{ flexDirection: "row", gap: 5 }}>
+                <Rss color="gray" size={15} strokeWidth={2} />
+                <Text style={{ color: "gray", fontSize: 10 }}>
+                  {post.channelSource}
+                </Text>
+              </View>
+            ) : null}
           </View>
 
           <View
@@ -223,20 +226,23 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={Styles.ParentContainer}>
+    <SafeAreaView style={Styles.ParentContainer}>
       {/* <ScrollView horizontal={true} style={{ padding: 10, backgroundColor: "", flexDirection: "row", }}>
         <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
         </View>
       </ScrollView> */}
       <FlatList
+        style={{ backgroundColor: "#ededed" }}
         ListHeaderComponent={
-          <View style={{ paddingHorizontal: 20, paddingTop: 50 }}>
+          <View
+            style={{ paddingHorizontal: 10, paddingTop: 20, paddingBottom: 20 }}
+          >
             <BreakingNewsCards content={breakingNews[0]} />
             <Text
               style={{
                 color: "#250e5e",
-                fontSize: 30,
+                fontSize: 35,
                 fontWeight: "bold",
                 fontFamily: "",
               }}
@@ -253,13 +259,14 @@ export default function HomeScreen() {
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const Styles = StyleSheet.create({
   ParentContainer: {
     flex: 1,
+    backgroundColor: "#1a19194d",
   },
   PostContainer: {
     flex: 1,
@@ -267,11 +274,11 @@ const Styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
     overflow: "hidden",
-    // shadowColor: "black",
-    // shadowOffset: {width: 0, height: 4,},
-    //  shadowOpacity: 0.3,
-    //  shadowRadius: 6,
-    //  elevation: 14
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 14,
   },
   textContainer: {
     flex: 1,

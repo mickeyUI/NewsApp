@@ -5,12 +5,15 @@ import {
   ScrollView,
   Image,
   Pressable,
+  Platform,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useEffect, useState, useRef } from "react";
 import { incrementUniqueReads } from "../hooks/fireStoreOperations";
 import { Repeat, ChevronLeft, Rows } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useFonts, Manrope_500Medium } from "@expo-google-fonts/manrope";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PostView() {
   const navigation = useNavigation<any>();
@@ -18,6 +21,10 @@ export default function PostView() {
   const { post } = route.params;
   const [content, setContent] = useState(post.originalText);
   const [lang, setLang] = useState(post.originalLanguage);
+
+  const [fontsLoaded] = useFonts({
+    Manrope_500Medium,
+  });
 
   useEffect(() => {
     incrementUniqueReads(post.id);
@@ -65,12 +72,17 @@ export default function PostView() {
       />
     );
   };
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#0606063e" }}>
       <ScrollView
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        style={{ paddingTop: 30 }}
+        style={{ paddingTop: 20, backgroundColor: "#f9f5f5" }}
       >
         <View style={{ padding: 10 }}>
           <Text style={{ fontSize: 30 }}>{post.summarizedText}</Text>
@@ -79,7 +91,7 @@ export default function PostView() {
         <IMG image={post.headerImage} />
 
         <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 16, paddingBottom: 10 }}>{content}</Text>
+          <Text style={styles.article}>{content}</Text>
         </View>
 
         <View
@@ -107,10 +119,19 @@ export default function PostView() {
           <Repeat color="white" size={32} strokeWidth={2} />
         </Pressable>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
+  article: {
+    fontFamily: "Manrope_500Medium",
+    textAlign: "justify",
+    fontSize: 15,
+    fontWeight: "400",
+    color: "#2D2D2D",
+    lineHeight: 25,
+    letterSpacing: 0.1,
+  },
   backButton: {
     position: "absolute",
     bottom: 20,

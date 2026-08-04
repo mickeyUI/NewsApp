@@ -9,24 +9,32 @@ export default function SplashScreen() {
   const navigation = useNavigation<any>();
   const [user, setUser] = useState();
   const handleAuthStateChange = async (user: any) => {
-    setUser(user);
-    if (user) {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists() && userDoc.data()?.isOnboarded) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "TabGroup" }],
-        });
+    try {
+      setUser(user);
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists() && userDoc.data()?.isOnboarded) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "TabGroup" }],
+          });
+        } else {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "OnBoardingScreen" }],
+          });
+        }
       } else {
         navigation.reset({
           index: 0,
-          routes: [{ name: "OnBoardingScreen" }],
+          routes: [{ name: "SignupScreen" }],
         });
       }
-    } else {
+    } catch (error) {
+      console.error("error on splashscreen", error);
       navigation.reset({
         index: 0,
-        routes: [{ name: "SignupScreen" }],
+        routes: [{ name: "LoginScreen" }],
       });
     }
   };
