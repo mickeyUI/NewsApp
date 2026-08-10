@@ -50,3 +50,5 @@ export const signInWithGoogle = async () => {
   const googleCredential = GoogleAuthProvider.credential(idToken);
   return signInWithCredential(auth, googleCredential);
 };
+
+export let pendingNotification = null;

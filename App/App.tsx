@@ -22,8 +22,9 @@ import {
   getInitialNotification,
 } from "@react-native-firebase/messaging";
 import { getApp } from "@react-native-firebase/app";
-import { useEffect } from "react";
+import { useEffect, createContext } from "react";
 import { messaging } from "./config/firebaseConfig";
+import { getContext, NotificationProvider } from "./hooks/context";
 
 type RootStackParamList = {
   SplashScreen: undefined;
@@ -117,31 +118,28 @@ const Stack = createNativeStackNavigator<RootStackParamList>({
 });
 
 const Navigation = createStaticNavigation(Stack);
-
-export default function App() {
-  const navigationRef = createNavigationContainerRef<RootStackParamList>();
-  const Navigation = createStaticNavigation(Stack);
-
+function AppContent() {
+  const { setPendingPostId } = getContext();
   useEffect(() => {
-    const unsubscribeForeground = onMessage(
-      messaging,
-      async (remoteMessage) => {
-        console.log("FOREGROUND:", remoteMessage);
+    // foreground setup
+    // const unsubscribeForeground = onMessage(
+    //   messaging,
+    //   async (remoteMessage) => {
+    //     console.log("FOREGROUND:", remoteMessage);
 
-        const postId = remoteMessage.data?.postId;
+    //     const postId = remoteMessage.data?.postId;
 
-        console.log("Post ID:", postId);
-      },
-    );
+    //     console.log("Post ID:", postId);
+    //   },
+    // );
 
     const unsubscribeOpened = onNotificationOpenedApp(
       messaging,
       (remoteMessage) => {
         const postId = remoteMessage.data?.postId;
-        if (postId && navigationRef.isReady()) {
-          navigationRef.navigate("PostView", {
-            postId,
-          });
+        console.log("OPENED APP:");
+        if (postId) {
+          setPendingPostId(postId);
         }
       },
     );
@@ -152,12 +150,10 @@ export default function App() {
       const remoteMessage = await getInitialNotification(messaging);
 
       if (remoteMessage) {
-        console.log("CLOSED APP OPEN:", remoteMessage);
+        console.log("CLOSED APP OPEN:");
         const postId = remoteMessage.data?.postId;
-        if (postId && navigationRef.isReady()) {
-          navigationRef.navigate("PostView", {
-            postId,
-          });
+        if (postId) {
+          setPendingPostId(postId);
         }
       }
     }
@@ -166,12 +162,20 @@ export default function App() {
 
     // Cleanup listeners
     return () => {
-      unsubscribeForeground();
+      // unsubscribeForeground();
       unsubscribeOpened();
     };
   }, []);
 
   return <Navigation />;
+}
+
+export default function App() {
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
+  );
 }
 
 const styles = StyleSheet.create({

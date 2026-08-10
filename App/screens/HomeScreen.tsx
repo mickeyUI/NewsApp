@@ -27,6 +27,7 @@ import {
 } from "../hooks/fireStoreOperations";
 import { Eye, BookOpen, Rss } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getContext } from "../hooks/context";
 
 export default function HomeScreen() {
   const [products, setProducts] = useState<any[]>([]);
@@ -36,6 +37,12 @@ export default function HomeScreen() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<any>();
+
+  const { pendingPostId, setPendingPostId } = getContext();
+  if (pendingPostId) {
+    navigation.navigate("PostView", { postId: pendingPostId });
+    setPendingPostId(null);
+  }
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -257,7 +264,7 @@ export default function HomeScreen() {
         refreshing={false}
         onRefresh={pullFeed}
         onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.2}
       />
     </SafeAreaView>
   );

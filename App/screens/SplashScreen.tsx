@@ -4,8 +4,10 @@ import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../config/firebaseConfig";
 import { getDoc, doc } from "@react-native-firebase/firestore";
+import { getContext } from "../hooks/context";
 
 export default function SplashScreen() {
+  const { pendingPostId, setPendingPostId } = getContext();
   const navigation = useNavigation<any>();
   const [user, setUser] = useState();
   const handleAuthStateChange = async (user: any) => {
@@ -14,10 +16,24 @@ export default function SplashScreen() {
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists() && userDoc.data()?.isOnboarded) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "TabGroup" }],
-          });
+          if (pendingPostId) {
+            navigation.reset({
+              index: 0,
+              routes: [
+                { name: "TabGroup" },
+                {
+                  name: "PostView",
+                  params: { postId: pendingPostId },
+                },
+              ],
+            });
+            setPendingPostId(null);
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "TabGroup" }],
+            });
+          }
         } else {
           navigation.reset({
             index: 0,
