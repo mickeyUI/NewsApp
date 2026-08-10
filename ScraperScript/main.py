@@ -98,6 +98,8 @@ def detect_language(text: str) -> str:
 import re
 
 def clean_text(text: str, lang: str) -> str:
+    text = re.sub(r"read more.*", "", text, flags=re.IGNORECASE | re.DOTALL)
+
     # Remove 3 or more consecutive stars
     text = re.sub(r"\*{3,}", " ", text)
 
@@ -114,14 +116,16 @@ def clean_text(text: str, lang: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
 
     if lang == "En":
-        # Remove hashtag symbol only (#word -> word)
+    # Remove hashtag symbol only (#word -> word)
         text = re.sub(r"#(?=\w+)", "", text)
         count = 0
         def replacedot(match):
             nonlocal count
             count += 1
             return "።\n\n" if count % 2 == 0 else "."
-        text = re.sub(r".", replacedot, text)
+        
+        # FIXED: Escape the dot so it targets literal periods only
+        text = re.sub(r"\.", replacedot, text)
         
     if lang == "Amh":
         # Remove hashtags completely (#word -> "")

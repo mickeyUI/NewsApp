@@ -14,20 +14,34 @@ import { Repeat, ChevronLeft, Rows } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts, Manrope_500Medium } from "@expo-google-fonts/manrope";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getDoc, doc } from "@react-native-firebase/firestore";
+import { db } from "../config/firebaseConfig";
 
 export default function PostView() {
   const navigation = useNavigation<any>();
   const route = useRoute();
-  const { post } = route.params;
-  const [content, setContent] = useState(post.originalText);
-  const [lang, setLang] = useState(post.originalLanguage);
+  const { postId } = route.params;
+  const [post, setPost] = useState<any>();
+  const [content, setContent] = useState("");
+  const [lang, setLang] = useState("");
 
   const [fontsLoaded] = useFonts({
     Manrope_500Medium,
   });
 
+  const loadPost = async () => {
+    const querySnapshot = await getDoc(doc(db, "posts", postId));
+    if (querySnapshot.exists()) {
+      const data = querySnapshot.data();
+      setPost(data);
+      setContent(data.originalText);
+      setLang(data.originalLanguage);
+    }
+  };
+
   useEffect(() => {
-    incrementUniqueReads(post.id);
+    loadPost();
+    incrementUniqueReads(postId);
   }, []);
 
   const lastY = useRef(0);
@@ -73,7 +87,7 @@ export default function PostView() {
     );
   };
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !post) {
     return null;
   }
 
@@ -122,6 +136,7 @@ export default function PostView() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   article: {
     fontFamily: "Manrope_500Medium",

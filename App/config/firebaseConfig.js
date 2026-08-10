@@ -6,7 +6,8 @@ import {
 } from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { getFirestore } from "@react-native-firebase/firestore";
-
+import { getMessaging, getToken } from "@react-native-firebase/messaging";
+import * as Notifications from "expo-notifications";
 const firebaseConfig = {
   apiKey: "AIzaSyAw6z41TwMtBg7sEYsFZGdWI0DCJJyjHS0",
   authDomain: "newsapp-9d962.firebaseapp.com",
@@ -17,10 +18,16 @@ const firebaseConfig = {
   databaseURL:
     "https://newsapp-9d962-default-rtdb.europe-west1.firebasedatabase.app",
 };
-
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore();
+export const messaging = getMessaging(app);
+const getAsyncRequred = async () => {
+  const token = await getToken(messaging);
+  const permission = await Notifications.getPermissionsAsync();
+  console.log("Notification permission:", permission);
+};
+getAsyncRequred();
 
 GoogleSignin.configure({
   webClientId:

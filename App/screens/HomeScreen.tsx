@@ -127,7 +127,7 @@ export default function HomeScreen() {
       <View style={Styles.PostContainer}>
         <Pressable
           onPress={() => {
-            navigation.navigate("PostView", { post });
+            navigation.navigate("PostView", { postId: post.id });
           }}
         >
           <IMGG url={post.headerImage} />

@@ -94,9 +94,9 @@ Return nothing else. No explanation, no markdown, just the JSON object."""
         if result.get("importance") not in [1, 2, 3]:
             result["importance"] = 2  # safe default
         if not isinstance(result.get("isBreaking"), bool):
-            result["isBreaking"] = False
+            result["isBreaking"] = True
         return result
     except json.JSONDecodeError:
         # If Groq returns something unparseable, use safe defaults
-        return {"category": "Neutral", "importance": 2, "isBreaking": False}
+        return {"category": "Neutral", "importance": 2, "isBreaking": True}
     

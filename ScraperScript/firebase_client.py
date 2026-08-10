@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore, storage
 import os
 from dotenv import load_dotenv
-
+from notification import breaking_news_notification
 load_dotenv()
 
 cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH"))
@@ -14,5 +14,6 @@ db = firestore.client()
 def save_post(post_data: dict):
     doc_ref = db.collection("posts").document()
     post_data["postId"] = doc_ref.id
+    breaking_news_notification(post_data['summarizedText'], doc_ref.id)
     doc_ref.set(post_data)
     print(f"✅ Saved post: {doc_ref.id}")
