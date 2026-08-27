@@ -10,6 +10,26 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 from supabase import create_client
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# Define a minimal HTTP handler for Render's port check
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is active")
+
+    def log_message(self, format, *args):
+        return # Suppress HTTP request logging in standard output
+
+def run_health_check():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    server.serve_forever()
+
+# Start the dummy HTTP server in a separate background thread
+threading.Thread(target=run_health_check, daemon=True).start()
 
 load_dotenv()
     
