@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    bottom: 20,
+    bottom: 30,
     left: "5%",
     borderRadius: 12,
     backgroundColor: "#101010c2",
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   tools: {
     position: "absolute",
-    bottom: 20,
+    bottom: 30,
     right: "5%",
     borderRadius: 12,
     backgroundColor: "#101010c2",

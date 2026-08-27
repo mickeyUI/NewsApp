@@ -240,7 +240,7 @@ export default function HomeScreen() {
         </View>
       </ScrollView> */}
       <FlatList
-        style={{ backgroundColor: "#ededed" }}
+        style={{ backgroundColor: "#ededed", flex: 1 }}
         ListHeaderComponent={
           <View
             style={{ paddingHorizontal: 10, paddingTop: 20, paddingBottom: 20 }}

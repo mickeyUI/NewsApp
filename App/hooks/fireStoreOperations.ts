@@ -75,7 +75,8 @@ export const incrementUniqueView = async (id: string) => {
 const scoredList = [];
 const thisWeekStart = () => {
   const aWeekAgo = new Date();
-  aWeekAgo.setDate(aWeekAgo.getDate() - 7);
+  // gonna change 7 to 30, 30 is for testing
+  aWeekAgo.setDate(aWeekAgo.getDate() - 30);
   return aWeekAgo.toISOString();
 };
 
@@ -129,7 +130,7 @@ const computeScore = async (post: any) => {
 };
 
 export const pullFeed = async (targetCount: number = 30) => {
-  // await AsyncStorage.clear();
+  await AsyncStorage.clear();
   const viewedIds = await getFromStorage("viewIds");
   const scoredList: any[] = [];
 

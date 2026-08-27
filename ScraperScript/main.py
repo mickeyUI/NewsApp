@@ -1,5 +1,6 @@
 from telethon import TelegramClient, events
 from telethon.tl.types import MessageMediaPhoto, MessageMediaDocument
+from telethon.sessions import StringSession
 from firebase_client import save_post
 from translator import translate_to_english, translate_to_amharic, classify_post
 from langdetect import detect
@@ -20,13 +21,16 @@ if API_ID_STR is None:
 API_ID = int(API_ID_STR)
 API_HASH = os.getenv("TELEGRAM_API_HASH")
 PHONE = os.getenv("TELEGRAM_PHONE")
-
+SESSION_STRING = os.getenv("SESSION_STRING")
+if not SESSION_STRING:
+    print("session string missing")
+    
 # Add the @usernames of the Ethiopian news channels you want to scrape
 TARGET_CHANNELS = [
     "ETNewsOn" # add more here
 ]
 
-client = TelegramClient("ethio_news_session", API_ID, API_HASH)
+client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
 
 #this is for the summurization
 import os
@@ -58,7 +62,7 @@ def summarization(txt: str) -> str:
     for attempt in range(3):
         completion = client.chat.completions.create(
             messages=messages,
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             temperature=0.0,  
         )
         
@@ -237,7 +241,7 @@ async def handler(event):
         )
 
 async def main():
-    await client.start(phone=PHONE)
+    await client.start()
     print("Scraper is running...")
     print(f" Watching channels: {TARGET_CHANNELS}")
     await client.run_until_disconnected()

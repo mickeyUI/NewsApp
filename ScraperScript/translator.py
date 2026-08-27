@@ -9,7 +9,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def detect_language(text: str) -> str:
     response= client.chat.completions.create(
-    model="llama-3.3-70b-versatile",
+    model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -26,7 +26,7 @@ def detect_language(text: str) -> str:
 
 def translate_to_english(amharic_text: str) -> str:
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -43,7 +43,7 @@ def translate_to_english(amharic_text: str) -> str:
 
 def translate_to_amharic(english_text: str) -> str:
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -63,7 +63,7 @@ def classify_post(text: str) -> dict:
     # Ask Groq to classify the post into a category and assign an importance score.
     # We ask for JSON so we can parse it reliably without regex hacks.
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -94,7 +94,7 @@ Return nothing else. No explanation, no markdown, just the JSON object."""
         if result.get("importance") not in [1, 2, 3]:
             result["importance"] = 2  # safe default
         if not isinstance(result.get("isBreaking"), bool):
-            result["isBreaking"] = True
+            result["isBreaking"] = False
         return result
     except json.JSONDecodeError:
         # If Groq returns something unparseable, use safe defaults
