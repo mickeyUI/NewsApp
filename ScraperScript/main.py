@@ -195,10 +195,19 @@ async def handler(event):
     supaUrl: str = ""
 
     if event.message.photo:
-        download_dir = '/home/mickey/Downloads/ETNewsScraperMedia'
+        download_dir = '/tmp/ETNewsScraperMedia'
         os.makedirs(download_dir, exist_ok=True)
-        file_path = await message.download_media(file= download_dir)
-        supaUrl = UploadToSupabase(file_path) 
+        
+        file_path = await message.download_media(file=download_dir)
+        
+        if file_path:
+            try:
+                supaUrl = UploadToSupabase(file_path) 
+            finally:
+                # Always execute this block to delete the file, even if the upload fails
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    print(f"🗑️ Deleted local file: {file_path}") 
         
         
 

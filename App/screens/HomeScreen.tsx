@@ -233,7 +233,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={Styles.ParentContainer}>
+    <View style={Styles.ParentContainer}>
       {/* <ScrollView horizontal={true} style={{ padding: 10, backgroundColor: "", flexDirection: "row", }}>
         <View style={{height: 40,width: 100,marginHorizontal: 5, backgroundColor: "white", borderRadius: 20,  justifyContent: "center", shadowColor: "black", shadowOffset: {width: 0, height: 4,}, shadowOpacity: 0.3, shadowRadius: 6, elevation: 14,}}>
           <Text style={{color: "black", textAlign: "center",}}>Sports</Text>
@@ -266,14 +266,14 @@ export default function HomeScreen() {
         onEndReached={loadMore}
         onEndReachedThreshold={0.2}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const Styles = StyleSheet.create({
   ParentContainer: {
     flex: 1,
-    backgroundColor: "#1a19194d",
+    backgroundColor: "#1a191911",
   },
   PostContainer: {
     flex: 1,

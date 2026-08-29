@@ -98,5 +98,5 @@ Return nothing else. No explanation, no markdown, just the JSON object."""
         return result
     except json.JSONDecodeError:
         # If Groq returns something unparseable, use safe defaults
-        return {"category": "Neutral", "importance": 2, "isBreaking": True}
+        return {"category": "Neutral", "importance": 2, "isBreaking": False}
     

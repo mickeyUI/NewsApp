@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Switch,
+  PermissionsAndroid,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { signOut } from "@react-native-firebase/auth";
 import { auth } from "../config/firebaseConfig";
@@ -7,7 +14,7 @@ import { User, Moon, Sun, LogOut, ChevronRight } from "lucide-react-native";
 
 const Profile = () => {
   const navigation = useNavigation<any>();
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   useEffect(() => {
@@ -42,6 +49,28 @@ const Profile = () => {
         border: "#E2E8F0",
       };
 
+  const requestNotificationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        {
+          title: "Notification Permission",
+          message: "",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        alert("Permission Granted");
+      } else {
+        console.log("Camera permission denied");
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View
@@ -71,7 +100,7 @@ const Profile = () => {
           },
         ]}
       >
-        <View style={styles.menuItem}>
+        {/* <View style={styles.menuItem}>
           <View style={styles.left}>
             {darkMode ? (
               <Moon color={theme.text} size={20} />
@@ -84,12 +113,22 @@ const Profile = () => {
           </View>
 
           <Switch value={darkMode} onValueChange={setDarkMode} />
-        </View>
+        </View> */}
 
         <TouchableOpacity onPress={handleSignOut} style={styles.menuItem}>
           <View style={styles.left}>
             <LogOut color="#EF4444" size={20} />
             <Text style={[styles.logoutText]}>Logout</Text>
+          </View>
+
+          <ChevronRight color="#64748B" size={18} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={requestNotificationPermission}
+          style={styles.menuItem}
+        >
+          <View>
+            <Text>Request Permission</Text>
           </View>
 
           <ChevronRight color="#64748B" size={18} />
@@ -120,7 +159,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#101825",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,

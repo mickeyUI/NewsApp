@@ -128,7 +128,7 @@ export default function PostView() {
           <ChevronLeft color="white" size={32} strokeWidth={2} />
         </Pressable>
       )}
-      {showToolbar && (
+      {showToolbar && post.textEn && (
         <Pressable onPress={changeLang} style={styles.tools}>
           <Repeat color="white" size={32} strokeWidth={2} />
         </Pressable>

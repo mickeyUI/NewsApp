@@ -14,10 +14,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Search, X, Eye, BookOpen, Rss } from "lucide-react-native";
+import { search } from "../hooks/fireStoreOperations";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SearchScreen() {
+  const navigation = useNavigation();
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState<any>([]);
 
   const handleSearch = async () => {
     // Prevent empty queries or submitting while already loading
@@ -27,13 +31,8 @@ export default function SearchScreen() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace this timeout with your actual backend fetch call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Example backend call:
-      // const response = await fetch(`YOUR_API_URL?q=${encodeURIComponent(query)}`);
-      // const data = await response.json();
-      // setResults(data);
+      const results: any = await search(query);
+      setSearchResults(results);
     } catch (error) {
       console.error("Search failed:", error);
     } finally {
@@ -121,7 +120,7 @@ export default function SearchScreen() {
             }}
           >
             <Text style={styles.metaData}>{post.channelUsername}</Text>
-            <Text style={styles.metaData}>{formatDate(post.scrapedAt)}</Text>
+            {/* <Text style={styles.metaData}>{formatDate(post.scrapedAt)}</Text> */}
           </View>
           {/* for debuging */}
           {/* <Text>{post.category || "none"}</Text>
@@ -133,7 +132,7 @@ export default function SearchScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.searchRow}>
           <View style={[styles.inputContainer, isLoading && styles.disabled]}>
@@ -148,7 +147,13 @@ export default function SearchScreen() {
               editable={!isLoading} // Lock input during search
             />
             {query.length > 0 && !isLoading && (
-              <Pressable onPress={() => setQuery("")} style={styles.clearBtn}>
+              <Pressable
+                onPress={() => {
+                  setQuery("");
+                  setSearchResults([]);
+                }}
+                style={styles.clearBtn}
+              >
                 <X color="gray" size={18} strokeWidth={2} />
               </Pressable>
             )}
@@ -167,22 +172,37 @@ export default function SearchScreen() {
           </Pressable>
         </View>
 
-        <View style={styles.lstContainer}>
+        {/* kinda like an explore feed in X or twitter  */}
+        {searchResults.length > 0 || query ? (
           <FlatList
-            data={null}
-            renderItem={(item) => <Posts post={item} />}
+            ListHeaderComponent={
+              <View>{!query && <Text>no news found</Text>}</View>
+            }
+            data={searchResults}
+            renderItem={({ item }) => <Posts post={item} />}
             keyExtractor={(item) => item.id}
           />
-        </View>
+        ) : (
+          <View
+            style={{
+              justifyContent: "center",
+              flex: 1,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{}}>search to find news</Text>
+          </View>
+        )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#04040444",
+    backgroundColor: "#04040405",
+    paddingTop: 20,
   },
   container: {
     flex: 1,
@@ -221,7 +241,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   lstContainer: {
-    backgroundColor: "white",
+    backgroundColor: "",
     flex: 1,
   },
   PostContainer: {

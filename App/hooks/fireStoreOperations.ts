@@ -130,7 +130,7 @@ const computeScore = async (post: any) => {
 };
 
 export const pullFeed = async (targetCount: number = 30) => {
-  await AsyncStorage.clear();
+  // await AsyncStorage.clear();
   const viewedIds = await getFromStorage("viewIds");
   const scoredList: any[] = [];
 
@@ -186,4 +186,29 @@ export const pullFeed = async (targetCount: number = 30) => {
   scoredList.sort((a, b) => b.score - a.score);
 
   return scoredList.slice(0, targetCount);
+};
+
+export const search = async (searchQuery: String = "result") => {
+  const results = [];
+  const q: any = query(
+    collection(db, "posts"),
+    where("postedAt", ">=", thisWeekStart()),
+    limit(200),
+  );
+  const querySnapshot: any = await getDocs(q);
+  for (const doc of querySnapshot.docs) {
+    const data = doc.data();
+
+    if (
+      data.summarizedText.includes(searchQuery) ||
+      data.textEn.includes(searchQuery)
+    ) {
+      results.push({
+        id: doc.id,
+        ...data,
+      });
+    }
+  }
+  console.log(results);
+  return results;
 };
