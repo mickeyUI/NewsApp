@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "OCEA",
-    "slug": "OCEA",
+    "slug": "mickeyas",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -35,6 +35,12 @@
       ],
       "@react-native-google-signin/google-signin",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "29409d56-6715-4e4e-b118-03da6fdd4e59"
+      }
+    },
+    "owner": "mickeyuis-team"
   }
 }
