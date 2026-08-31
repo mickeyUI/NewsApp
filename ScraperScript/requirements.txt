@@ -1,6 +1,0 @@
-telethon
-firebase-admin
-groq
-python-dotenv
-langdetect
-supabase
